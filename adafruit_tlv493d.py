@@ -49,9 +49,11 @@ import adafruit_bus_device.i2c_device as i2cdevice
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TLV493D.git"
 
-class TLV493D:    
+class TLV493D:
     """Driver for the TLV493D 3-axis Magnetometer.
+
     :param busio.I2C i2c_bus: The I2C bus the TLV493D is connected to.
+
     """
 
     read_masks = {
@@ -85,16 +87,16 @@ class TLV493D:
         "RES3":(3, 0x1F, 0)
     }
 
-    def __init__(self, i2c_interface):
-        self.i2c_device = i2cdevice.I2CDevice(i2c_interface, 0x5E)
+    def __init__(self, i2c_bus):
+        self.i2c_device = i2cdevice.I2CDevice(i2c_bus, 0x5E)
         self.read_buffer = bytearray(10)
         self.write_buffer = bytearray(4)
 
         # read in data from sensor, including data that must be set on a write
         self._setup_write_buffer()
-        
+
         # setup MASTERCONTROLLEDMODE which takes a measurement for every read
-        self._set_write_key('PARITY', 1)   
+        self._set_write_key('PARITY', 1)
         self._set_write_key('PARITY', 1)
         self._set_write_key('LOWPOWER', 1)
         self._set_write_key('LP_PERIOD', 1)
@@ -145,7 +147,7 @@ class TLV493D:
                 self._unpack_and_scale(y_top, y_bot),
                 self._unpack_and_scale(z_top, z_bot))
 
-    def _unpack_and_scale(self, top, bottom):
-        binval = struct.unpack_from(">h", bytearray([top, bottom]))[0] 
+    def _unpack_and_scale(self, top, bottom): #pylint: disable=no-self-use
+        binval = struct.unpack_from(">h", bytearray([top, bottom]))[0]
         binval = binval >>4
         return binval * 0.098
