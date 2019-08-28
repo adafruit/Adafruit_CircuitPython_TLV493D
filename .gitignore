@@ -9,5 +9,4 @@ bundles
 *.DS_Store
 .eggs
 dist
-docs/
 **/*.egg-info
