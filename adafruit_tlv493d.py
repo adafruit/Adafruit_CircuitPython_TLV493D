@@ -157,36 +157,42 @@ class TLV493D:
         current_write_byte &= ~write_mask
         current_write_byte |= value<<write_shift
         self.write_buffer[write_byte_num] = current_write_byte
+    
+    # @staticmethod
+    # def binPrint(number, places=16, end_str=""):
+    #     out = []
+    #     for i in range(places):
+    #         dig_shift = number >> i
+    #         if dig_shift & 1:
+    #             out.append("1")
+    #         else:
+    #             out.append("0")
+    #     out.reverse()
+    #     print("".join(out), end=end_str)
 
     @property
     def x(self):
         self._read_i2c()
         x_top = self._get_read_key("BX1")
-        x_bot = self._get_read_key("BX2")
-        x_val = x_top<<4 | x_bot
-        xtop = (x_val & 0xFF00)>>8
-        xbot = (x_val & 0x00FF)
-        binval = struct.unpack_from(">h", bytearray([xtop, xbot]))[0] 
-        return binval
+        x_bot = ((self._get_read_key("BX2") << 4) & 0xFF)
+        binval = struct.unpack_from(">h", bytearray([x_top, x_bot]))[0] 
+        binval = binval >>4
+        return binval * 0.098
 
     @property
     def y(self):
         self._read_i2c()
         y_top = self._get_read_key("BY1")
-        y_bot = self._get_read_key("BY2")
-        y_val = y_top<<4 | y_bot
-        ytop = (y_val & 0xFF00)>>8
-        ybot = (y_val & 0x00FF)
-        binval = struct.unpack_from(">h", bytearray([ytop, ybot]))[0] 
-        return binval
+        y_bot = ((self._get_read_key("BY2") << 4) & 0xFF)
+        binval = struct.unpack_from(">h", bytearray([y_top, y_bot]))[0] 
+        binval = binval >>4
+        return binval * 0.098
 
     @property
     def z(self):
         self._read_i2c()
         z_top = self._get_read_key("BZ1")
-        z_bot = self._get_read_key("BZ2")
-        z_val = z_top<<4 | z_bot
-        ztop = (z_val & 0xFF00)>>8
-        zbot = (z_val & 0x00FF)
-        binval = struct.unpack_from(">h", bytearray([ztop, zbot]))[0] 
-        return binval
+        z_bot = ((self._get_read_key("BZ2") << 4) & 0xFF)
+        binval = struct.unpack_from(">h", bytearray([z_top, z_bot]))[0]
+        binval = binval >>4
+        return binval  * 0.098
