@@ -61,7 +61,19 @@ To install in a virtual environment in your current project:
 Usage Example
 =============
 
-.. todo:: Add a quick, simple example. It and other examples should live in the examples folder and be included in docs/examples.rst.
+.. code-block:: python
+
+    import time
+    import board
+    import adafruit_tlv493d
+
+    i2c = board.I2C()
+
+    tlv = adafruit_tlv493d.TLV493D(i2c)
+
+    while True:
+        print("%s, %s, %s"%tlv.magnetic)
+        time.sleep(1)
 
 Contributing
 ============

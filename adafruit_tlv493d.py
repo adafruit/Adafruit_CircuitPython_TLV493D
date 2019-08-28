@@ -25,7 +25,6 @@
 
 CircuitPython helper library for the TLV493D 3-axis magnetometer
 
-
 * Author(s): Bryan Siepert
 
 Implementation Notes
@@ -43,18 +42,17 @@ Adafruit's TLV493D Breakout https://adafruit.com/products
   https://github.com/adafruit/circuitpython/releases
 
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-* Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
 import struct
 import adafruit_bus_device.i2c_device as i2cdevice
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TLV493D.git"
-DEFAULT_TLV_ADDRESS = 0x5E
 
-
-class TLV493D:
-    """IT'S A CLASS"""
+class TLV493D:    
+    """Driver for the TLV493D 3-axis Magnetometer.
+    :param busio.I2C i2c_bus: The I2C bus the TLV493D is connected to.
+    """
 
     read_masks = {
         "BX1": (0, 0xFF, 0),
@@ -87,44 +85,25 @@ class TLV493D:
         "RES3":(3, 0x1F, 0)
     }
 
-    def __init__(self, i2c_interface, i2c_address=DEFAULT_TLV_ADDRESS):
-        self.i2c_device = i2cdevice.I2CDevice(i2c_interface, i2c_address)
+    def __init__(self, i2c_interface):
+        self.i2c_device = i2cdevice.I2CDevice(i2c_interface, 0x5E)
         self.read_buffer = bytearray(10)
         self.write_buffer = bytearray(4)
-        self._setup_write_buffer()
 
-        # // get all register data from sensor
-        # tlv493d::readOut(&mInterface);
-        # // copy factory settings to write registers
-        # setRegBits(tlv493d::W_RES1, getRegBits(tlv493d::R_RES1)); THREE TIMES?
-        # // enable parity detection
+        # read in data from sensor, including data that must be set on a write
+        self._setup_write_buffer()
         
-        print("\nWrite buffer:")
-        self.print_bytes(self.write_buffer)
-        self._set_write_key('PARITY', 1);
-        print("\nWrite buffer:")
-        self.print_bytes(self.write_buffer)
-        # // config sensor to lowpower mode
-        # // also contains parity calculation and writeout to sensor
-        # setAccessMode(TLV493D_DEFAULTMODE);        
-        self._set_write_key('PARITY', 1);
-        self._set_write_key('LOWPOWER', 1);
-        self._set_write_key('LP_PERIOD', 1);
-        print("\nWrite buffer:")
-        self.print_bytes(self.write_buffer)
+        # setup MASTERCONTROLLEDMODE which takes a measurement for every read
+        self._set_write_key('PARITY', 1)   
+        self._set_write_key('PARITY', 1)
+        self._set_write_key('LOWPOWER', 1)
+        self._set_write_key('LP_PERIOD', 1)
         self._write_i2c()
-        print("wrote output buffer out")
 
     def _read_i2c(self):
         with self.i2c_device as i2c:
             i2c.readinto(self.read_buffer)
         # self.print_bytes(self.read_buffer)
-
-    @staticmethod
-    def print_bytes(bites):
-        """DOC STRING"""
-        for byte in bites:
-            print("%s (%s)"%(bin(byte), hex(byte)))
 
     def _write_i2c(self):
         with self.i2c_device as i2c:
@@ -132,18 +111,9 @@ class TLV493D:
 
     def _setup_write_buffer(self):
         self._read_i2c()
-        print("Read buffer:")
-        self.print_bytes(self.read_buffer)
-        print("\nWrite buffer:")
-        self.print_bytes(self.write_buffer)
-
         for key in ['RES1', 'RES2', 'RES3']:
             write_value = self._get_read_key(key)
             self._set_write_key(key, write_value)
-        print("Read buffer:")
-        self.print_bytes(self.read_buffer)
-        print("\nWrite buffer:")
-        self.print_bytes(self.write_buffer)
 
     def _get_read_key(self, key):
         read_byte_num, read_mask, read_shift = self.read_masks[key]
@@ -157,42 +127,25 @@ class TLV493D:
         current_write_byte &= ~write_mask
         current_write_byte |= value<<write_shift
         self.write_buffer[write_byte_num] = current_write_byte
-    
-    # @staticmethod
-    # def binPrint(number, places=16, end_str=""):
-    #     out = []
-    #     for i in range(places):
-    #         dig_shift = number >> i
-    #         if dig_shift & 1:
-    #             out.append("1")
-    #         else:
-    #             out.append("0")
-    #     out.reverse()
-    #     print("".join(out), end=end_str)
 
     @property
-    def x(self):
-        self._read_i2c()
+    def magnetic(self):
+        """The processed magnetometer sensor values.
+        A 3-tuple of X, Y, Z axis values in microteslas that are signed floats.
+        """
+        self._read_i2c() # update read registers
         x_top = self._get_read_key("BX1")
         x_bot = ((self._get_read_key("BX2") << 4) & 0xFF)
-        binval = struct.unpack_from(">h", bytearray([x_top, x_bot]))[0] 
-        binval = binval >>4
-        return binval * 0.098
-
-    @property
-    def y(self):
-        self._read_i2c()
         y_top = self._get_read_key("BY1")
         y_bot = ((self._get_read_key("BY2") << 4) & 0xFF)
-        binval = struct.unpack_from(">h", bytearray([y_top, y_bot]))[0] 
-        binval = binval >>4
-        return binval * 0.098
-
-    @property
-    def z(self):
-        self._read_i2c()
         z_top = self._get_read_key("BZ1")
         z_bot = ((self._get_read_key("BZ2") << 4) & 0xFF)
-        binval = struct.unpack_from(">h", bytearray([z_top, z_bot]))[0]
+
+        return (self._unpack_and_scale(x_top, x_bot),
+                self._unpack_and_scale(y_top, y_bot),
+                self._unpack_and_scale(z_top, z_bot))
+
+    def _unpack_and_scale(self, top, bottom):
+        binval = struct.unpack_from(">h", bytearray([top, bottom]))[0] 
         binval = binval >>4
-        return binval  * 0.098
+        return binval * 0.098
