@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TLV493D.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TLV493D
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_TLV493D/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_TLV493D/actions/
     :alt: Build Status
 
 CircuitPython helper library for the TLV493D 3-axis magnetometer
