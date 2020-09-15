@@ -46,15 +46,19 @@ Adafruit's TLV493D Breakout https://adafruit.com/products
 
 import struct
 import adafruit_bus_device.i2c_device as i2cdevice
+from micropython import const
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TLV493D.git"
+
+_TLV493D_DEFAULT_ADDRESS = const(0x5E)
 
 
 class TLV493D:
     """Driver for the TLV493D 3-axis Magnetometer.
 
     :param busio.I2C i2c_bus: The I2C bus the TLV493D is connected to.
+    :param int address: The I2C address of the TLV493D. Defaults to 0x5E.
 
     """
 
@@ -89,8 +93,8 @@ class TLV493D:
         "RES3": (3, 0x1F, 0),
     }
 
-    def __init__(self, i2c_bus):
-        self.i2c_device = i2cdevice.I2CDevice(i2c_bus, 0x5E)
+    def __init__(self, i2c_bus, address=_TLV493D_DEFAULT_ADDRESS):
+        self.i2c_device = i2cdevice.I2CDevice(i2c_bus, address)
         self.read_buffer = bytearray(10)
         self.write_buffer = bytearray(4)
 
