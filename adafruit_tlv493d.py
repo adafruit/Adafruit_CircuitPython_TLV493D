@@ -59,6 +59,7 @@ class TLV493D:
 
     :param busio.I2C i2c_bus: The I2C bus the TLV493D is connected to.
     :param int address: The I2C address of the TLV493D. Defaults to 0x5E.
+    :param int addr_reg: Initial value of the I2C address register. Defaults to 0.
 
     """
 
@@ -93,13 +94,16 @@ class TLV493D:
         "RES3": (3, 0x1F, 0),
     }
 
-    def __init__(self, i2c_bus, address=_TLV493D_DEFAULT_ADDRESS):
+    def __init__(self, i2c_bus, address=_TLV493D_DEFAULT_ADDRESS, addr_reg=0):
         self.i2c_device = i2cdevice.I2CDevice(i2c_bus, address)
         self.read_buffer = bytearray(10)
         self.write_buffer = bytearray(4)
 
         # read in data from sensor, including data that must be set on a write
         self._setup_write_buffer()
+
+        # write correct i2c address
+        self._set_write_key("ADDR", addr_reg)
 
         # setup MASTERCONTROLLEDMODE which takes a measurement for every read
         self._set_write_key("PARITY", 1)
