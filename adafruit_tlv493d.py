@@ -90,9 +90,8 @@ class TLV493D:
 
         # setup MASTERCONTROLLEDMODE which takes a measurement for every read
         self._set_write_key("PARITY", 1)
-        self._set_write_key("PARITY", 1)
+        self._set_write_key("FAST", 1)
         self._set_write_key("LOWPOWER", 1)
-        self._set_write_key("LP_PERIOD", 1)
         self._write_i2c()
 
     def _read_i2c(self):
