@@ -15,16 +15,17 @@ Implementation Notes
 
 **Hardware:**
 
-
-Adafruit's TLV493D Breakout https://adafruit.com/products
+* Adafruit `TLV493D Triple-Axis Magnetometer
+  <https://www.adafruit.com/product/4366>`_
 
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
+  https://circuitpython.org/downloads
 
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
 """
 
 import struct
@@ -40,9 +41,33 @@ _TLV493D_DEFAULT_ADDRESS = const(0x5E)
 class TLV493D:
     """Driver for the TLV493D 3-axis Magnetometer.
 
-    :param busio.I2C i2c_bus: The I2C bus the TLV493D is connected to.
-    :param int address: The I2C address of the TLV493D. Defaults to 0x5E.
-    :param int addr_reg: Initial value of the I2C address register. Defaults to 0.
+    :param ~busio.I2C i2c_bus: The I2C bus the device is connected to
+    :param int address: The I2C device address. Defaults to :const:`0x5E`
+    :param int addr_reg: Initial value of the I2C address register. Defaults to :const:`0`.
+
+
+    **Quickstart: Importing and using the device**
+
+        Here is an example of using the :class:`TLV493D` class.
+        First you will need to import the libraries to use the sensor
+
+        .. code-block:: python
+
+            import board
+            import adafruit_tlv493d
+
+        Once this is done you can define your `board.I2C` object and define your sensor object
+
+        .. code-block:: python
+
+            i2c = board.I2C()  # uses board.SCL and board.SDA
+            tlv = adafruit_tlv493d.TLV493D(i2c)
+
+        Now you have access to the :attr:`magnetic` attribute
+
+        .. code-block:: python
+
+            acc_x, acc_y, acc_z = tlv.magnetic
 
     """
 

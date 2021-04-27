@@ -23,10 +23,12 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    Adafruit TLV493D Triple-Axis Magnetometer Learning Guide <https://learn.adafruit.com/adafruit-tlv493-triple-axis-magnetometer>
+
 .. toctree::
     :caption: Related Products
 
-    Adafruit TLV493D Breakout  <https://adafruit.com/products>
+    Adafruit TLV493D Triple-Axis Magnetometer <https://www.adafruit.com/product/4366>
 
 .. toctree::
     :caption: Other Links
