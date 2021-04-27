@@ -55,14 +55,13 @@ To install in a virtual environment in your current project:
 Usage Example
 =============
 
-.. code-block:: python
+.. code-block:: python3
 
     import time
     import board
-    import busio
     import adafruit_tlv493d
 
-    i2c = busio.I2C(board.SCL, board.SDA)
+    i2c = board.I2C()  # uses board.SCL and board.SDA
     tlv = adafruit_tlv493d.TLV493D(i2c)
 
     while True:
