@@ -68,6 +68,11 @@ Usage Example
         print("X: %s, Y:%s, Z:%s mT"%tlv.magnetic)
         time.sleep(1)
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tlv493d/en/latest/>`_.
+
 Contributing
 ============
 
