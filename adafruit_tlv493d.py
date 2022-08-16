@@ -32,7 +32,7 @@ import struct
 import adafruit_bus_device.i2c_device as i2cdevice
 from micropython import const
 
-__version__ = "0.0.0-auto.0"
+__version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TLV493D.git"
 
 _TLV493D_DEFAULT_ADDRESS = const(0x5E)
