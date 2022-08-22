@@ -174,9 +174,8 @@ class TLV493D:
             self._unpack_and_scale(z_top, z_bot),
         )
 
-    def _unpack_and_scale(  # pylint: disable=no-self-use
-        self, top: int, bottom: int
-    ) -> float:
+    @staticmethod
+    def _unpack_and_scale(top: int, bottom: int) -> float:
         binval = struct.unpack_from(">h", bytearray([top, bottom]))[0]
         binval = binval >> 4
         return binval * 0.098
