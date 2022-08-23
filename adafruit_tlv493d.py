@@ -142,13 +142,13 @@ class TLV493D:
             write_value = self._get_read_key(key)
             self._set_write_key(key, write_value)
 
-    def _get_read_key(self, key: int) -> int:
+    def _get_read_key(self, key: str) -> int:
         read_byte_num, read_mask, read_shift = self.read_masks[key]
         raw_read_value = self.read_buffer[read_byte_num]
         write_value = (raw_read_value & read_mask) >> read_shift
         return write_value
 
-    def _set_write_key(self, key: int, value: int) -> None:
+    def _set_write_key(self, key: str, value: int) -> None:
         write_byte_num, write_mask, write_shift = self.write_masks[key]
         current_write_byte = self.write_buffer[write_byte_num]
         current_write_byte &= ~write_mask
