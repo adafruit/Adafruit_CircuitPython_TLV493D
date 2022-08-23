@@ -32,6 +32,12 @@ import struct
 import adafruit_bus_device.i2c_device as i2cdevice
 from micropython import const
 
+try:
+    from typing import Tuple
+    from busio import I2C
+except ImportError:
+    pass
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TLV493D.git"
 
@@ -102,7 +108,9 @@ class TLV493D:
         "RES3": (3, 0x1F, 0),
     }
 
-    def __init__(self, i2c_bus, address=_TLV493D_DEFAULT_ADDRESS, addr_reg=0):
+    def __init__(
+        self, i2c_bus: I2C, address: int = _TLV493D_DEFAULT_ADDRESS, addr_reg: int = 0
+    ) -> None:
         self.i2c_device = i2cdevice.I2CDevice(i2c_bus, address)
         self.read_buffer = bytearray(10)
         self.write_buffer = bytearray(4)
@@ -119,28 +127,28 @@ class TLV493D:
         self._set_write_key("LOWPOWER", 1)
         self._write_i2c()
 
-    def _read_i2c(self):
+    def _read_i2c(self) -> None:
         with self.i2c_device as i2c:
             i2c.readinto(self.read_buffer)
         # self.print_bytes(self.read_buffer)
 
-    def _write_i2c(self):
+    def _write_i2c(self) -> None:
         with self.i2c_device as i2c:
             i2c.write(self.write_buffer)
 
-    def _setup_write_buffer(self):
+    def _setup_write_buffer(self) -> None:
         self._read_i2c()
         for key in ["RES1", "RES2", "RES3"]:
             write_value = self._get_read_key(key)
             self._set_write_key(key, write_value)
 
-    def _get_read_key(self, key):
+    def _get_read_key(self, key: str) -> int:
         read_byte_num, read_mask, read_shift = self.read_masks[key]
         raw_read_value = self.read_buffer[read_byte_num]
         write_value = (raw_read_value & read_mask) >> read_shift
         return write_value
 
-    def _set_write_key(self, key, value):
+    def _set_write_key(self, key: str, value: int) -> None:
         write_byte_num, write_mask, write_shift = self.write_masks[key]
         current_write_byte = self.write_buffer[write_byte_num]
         current_write_byte &= ~write_mask
@@ -148,7 +156,7 @@ class TLV493D:
         self.write_buffer[write_byte_num] = current_write_byte
 
     @property
-    def magnetic(self):
+    def magnetic(self) -> Tuple[float, float, float]:
         """The processed magnetometer sensor values.
         A 3-tuple of X, Y, Z axis values in microteslas that are signed floats.
         """
@@ -166,7 +174,8 @@ class TLV493D:
             self._unpack_and_scale(z_top, z_bot),
         )
 
-    def _unpack_and_scale(self, top, bottom):  # pylint: disable=no-self-use
+    @staticmethod
+    def _unpack_and_scale(top: int, bottom: int) -> float:
         binval = struct.unpack_from(">h", bytearray([top, bottom]))[0]
         binval = binval >> 4
         return binval * 0.098
