@@ -158,7 +158,7 @@ class TLV493D:
     @property
     def magnetic(self) -> Tuple[float, float, float]:
         """The processed magnetometer sensor values.
-        A 3-tuple of X, Y, Z axis values in microteslas that are signed floats.
+        A 3-tuple of X, Y, Z axis values in milliteslas that are signed floats.
         """
         self._read_i2c()  # update read registers
         x_top = self._get_read_key("BX1")
