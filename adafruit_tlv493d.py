@@ -178,4 +178,4 @@ class TLV493D:
     def _unpack_and_scale(top: int, bottom: int) -> float:
         binval = struct.unpack_from(">h", bytearray([top, bottom]))[0]
         binval = binval >> 4
-        return binval * 0.098
+        return binval * 98.0
