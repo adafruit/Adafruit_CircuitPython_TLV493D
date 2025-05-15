@@ -29,11 +29,13 @@ Implementation Notes
 """
 
 import struct
+
 import adafruit_bus_device.i2c_device as i2cdevice
 from micropython import const
 
 try:
     from typing import Tuple
+
     from busio import I2C
 except ImportError:
     pass
