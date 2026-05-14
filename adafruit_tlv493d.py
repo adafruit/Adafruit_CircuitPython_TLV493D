@@ -52,6 +52,8 @@ class TLV493D:
     :param ~busio.I2C i2c_bus: The I2C bus the device is connected to
     :param int address: The I2C device address. Defaults to :const:`0x5E`
     :param int addr_reg: Initial value of the I2C address register. Defaults to :const:`0`.
+    :param bool fast_mode: If fast mode should be used.
+        May trigger known freeze issue on chip version "TLV493-A1B6". Defaults to :const:`True`.
 
 
     **Quickstart: Importing and using the device**
@@ -111,7 +113,11 @@ class TLV493D:
     }
 
     def __init__(
-        self, i2c_bus: I2C, address: int = _TLV493D_DEFAULT_ADDRESS, addr_reg: int = 0
+        self,
+        i2c_bus: I2C,
+        address: int = _TLV493D_DEFAULT_ADDRESS,
+        addr_reg: int = 0,
+        fast_mode: bool = True,
     ) -> None:
         self.i2c_device = i2cdevice.I2CDevice(i2c_bus, address)
         self.read_buffer = bytearray(10)
@@ -125,7 +131,7 @@ class TLV493D:
 
         # setup MASTERCONTROLLEDMODE which takes a measurement for every read
         self._set_write_key("PARITY", 1)
-        self._set_write_key("FAST", 1)
+        self._set_write_key("FAST", int(fast_mode))
         self._set_write_key("LOWPOWER", 1)
         self._write_i2c()
 
